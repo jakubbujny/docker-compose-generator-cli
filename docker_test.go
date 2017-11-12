@@ -40,7 +40,6 @@ func TestPullImageNotFoundWhilePulling(t *testing.T) {
 
 func TestPullNormalImageWihtoutNamespace(t *testing.T) {
 	docker := MakeDocker()
-
 	res,err := docker.PullImage("library/busybox")
 	if err != nil  {
 		t.Fatal("It's ok so it should be nil")

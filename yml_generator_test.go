@@ -31,7 +31,7 @@ func TestNamedVolumesGenerationSinglePathEndingSlash(t *testing.T) {
 func TestNamedVolumesGenerationMultipartPath(t *testing.T) {
 	path := "/data/some/dir"
 	output := convertVolumesToNamedVolumes([]string{path}, "test")
-	if !strings.Contains(output[0], "test_data:/data/some/dir") {
+	if !strings.Contains(output[0], "test_dir:/data/some/dir") {
 		t.Error("Failed generation, output: "+output[0])
 	}
 }

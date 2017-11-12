@@ -23,8 +23,9 @@ func convertVolumesToNamedVolumes(volumes []string, serviceName string) []string
 
 	for _,volume := range volumes {
 		sufix := ""
-		if len(regexp.MustCompile("/").FindAllStringIndex(volume, -1)) > 1 {
-			sufix = strings.Split(volume, "/")[1]
+		if len(regexp.MustCompile("/").FindAllStringIndex(volume, -1)) > 1 && !strings.HasSuffix(volume,"/") {
+			split := strings.Split(volume, "/")
+			sufix = split[len(split)-1]
 		} else {
 			sufix = strings.Replace(volume, "/", "", -1)
 		}
