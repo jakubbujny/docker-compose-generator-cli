@@ -13,7 +13,7 @@ generating/appending following docker-compose config:
         ports:
            - 6379:6379
         volumes:
-           - redis:/data
+           - redis_data:/data
        
        
 I'm gonna describe more features in future.
