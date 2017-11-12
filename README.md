@@ -7,11 +7,10 @@ dcgc tool redis
 
 generating/appending following docker-compose config:
 
-service redis:
-
-    image: redis
-    ports:
-       - 6379:6379
-    volumes:
-       - redis:/data
+    service redis:
+        image: redis
+        ports:
+           - 6379:6379
+        volumes:
+           - redis:/data
        
