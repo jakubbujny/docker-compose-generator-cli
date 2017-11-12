@@ -8,7 +8,7 @@ My dream is to allow simple commands like:
      
 generating/appending following docker-compose config:
 
-    service redis:
+    redis:
         image: redis
         ports:
            - 6379:6379
