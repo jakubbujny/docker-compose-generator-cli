@@ -1,10 +1,11 @@
 # docker-compose-generator-cli
-This is very initial version of simple CLI tool written in golang
-
+This is very initial version of simple CLI tool written in golang.
+Main goal is to provide simple automation tool for prototyping microservices/tools.
+It's also learning project to improve my skills in golang.
 My dream is to allow simple commands like:
 
-dcgc tool redis
-
+     dcgc tool redis
+     
 generating/appending following docker-compose config:
 
     service redis:
@@ -14,3 +15,8 @@ generating/appending following docker-compose config:
         volumes:
            - redis:/data
        
+       
+I'm gonna describe more features in future.
+
+
+    
