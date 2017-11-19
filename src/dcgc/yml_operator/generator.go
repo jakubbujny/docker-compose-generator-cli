@@ -1,15 +1,16 @@
-package yml_generator
+package yml_operator
 
 import (
-	"github.com/ghodss/yaml"
+	"gopkg.in/yaml.v2"
 	"strings"
 	"regexp"
+	"strconv"
 )
 
 type DockerService struct {
-	Image   string   `json:"image"`
-	Ports   []string `json:"ports"`
-	Volumes []string `json:"volumes"`
+	Image   string   `yaml:"image"`
+	Ports   []string `yaml:"ports"`
+	Volumes []string `yaml:"volumes"`
 }
 func convertPortsToPublishForm(ports []string) []string {
 	toReturn := make([]string, 0, len(ports))
@@ -18,18 +19,35 @@ func convertPortsToPublishForm(ports []string) []string {
 	}
 	return toReturn
 }
+func existsInList(list []string, element string) bool {
+	for _,el := range list {
+		if strings.Contains(el, element) {
+			return true
+		}
+	}
+	return false
+}
 func convertVolumesToNamedVolumes(volumes []string, serviceName string) []string {
 	toReturn := make([]string, 0, len(volumes))
 
-	for _,volume := range volumes {
+	for _, volumePath := range volumes {
 		sufix := ""
-		if len(regexp.MustCompile("/").FindAllStringIndex(volume, -1)) > 1 && !strings.HasSuffix(volume,"/") {
-			split := strings.Split(volume, "/")
+		if len(regexp.MustCompile("/").FindAllStringIndex(volumePath, -1)) > 1 && !strings.HasSuffix(volumePath,"/") {
+			split := strings.Split(volumePath, "/")
 			sufix = split[len(split)-1]
 		} else {
-			sufix = strings.Replace(volume, "/", "", -1)
+			sufix = strings.Replace(volumePath, "/", "", -1)
 		}
-		toReturn = append(toReturn, serviceName+"_"+sufix+":"+volume)
+
+		volumeName := serviceName + "_" + sufix
+		i := 1
+		for existsInList(toReturn, volumeName) {
+			volumeName = serviceName+"_" + sufix + strconv.Itoa(i)
+			i++
+		}
+		dockerVolumeString := volumeName + ":" + volumePath
+
+		toReturn = append(toReturn, dockerVolumeString)
 	}
 	return toReturn
 }

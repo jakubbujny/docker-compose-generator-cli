@@ -11,6 +11,7 @@ func TestRemoveImage(t *testing.T) {
 	docker := New()
 	image := "library/busybox"
 	//when
+	docker.PullImage(image)
 	res,err := docker.RemoveImage(image)
 	assert.Nil(err)
 	assert.Contains(res, "busybox:latest")

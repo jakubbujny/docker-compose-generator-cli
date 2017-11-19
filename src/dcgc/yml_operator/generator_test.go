@@ -1,4 +1,4 @@
-package yml_generator
+package yml_operator
 
 import (
 	"testing"
@@ -29,6 +29,18 @@ func TestNamedVolumesGenerationSinglePath(t *testing.T) {
 	output := convertVolumesToNamedVolumes(path, service)
 	//then
 	assert.Contains(output[0], "test_data:/data")
+}
+
+func TestNamedVolumesGeneratioSameNameManyTimes(t *testing.T) {
+	assert := assert.New(t)
+	//given
+	path := []string{"/data", "/data"}
+	service := "test"
+	//when
+	output := convertVolumesToNamedVolumes(path, service)
+	//then
+	assert.Contains(output[0], "test_data:/data")
+	assert.Contains(output[1], "test_data1:/data")
 }
 
 func TestNamedVolumesGenerationSinglePathEndingSlash(t *testing.T) {
