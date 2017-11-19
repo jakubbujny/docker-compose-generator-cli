@@ -1,4 +1,4 @@
-package main
+package docker
 
 import (
 	"github.com/docker/docker/client"
@@ -9,7 +9,7 @@ import (
 type Docker struct {
 	cli *client.Client
 }
-func MakeDocker() Docker {
+func New() Docker {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)

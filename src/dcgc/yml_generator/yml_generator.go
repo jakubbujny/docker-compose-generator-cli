@@ -1,4 +1,4 @@
-package main
+package yml_generator
 
 import (
 	"github.com/ghodss/yaml"
@@ -40,7 +40,7 @@ func convertImageToServiceName(imageName string) string {
 		return imageName
 	}
 }
-func GenerateToolService(ports []string, volumes []string, image string) (string, error) {
+func GenerateYml(ports []string, volumes []string, image string) (string, error) {
 	serviceName := convertImageToServiceName(image)
 	service := DockerService{image, convertPortsToPublishForm(ports), convertVolumesToNamedVolumes(volumes, serviceName)}
 
