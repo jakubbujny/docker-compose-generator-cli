@@ -9,6 +9,9 @@ func insertSpaces(slices []string, spacesCount int) []string {
 	toInsert := strings.Repeat(" ", spacesCount)
 	slicesToReturn := make([]string, 0)
 	for _, el := range slices {
+		if len(el) == 0 {
+			continue
+		}
 		slicesToReturn = append(slicesToReturn, toInsert+el)
 	}
 	return slicesToReturn
@@ -32,16 +35,16 @@ func AppendToYmlInSection(toAppend string, sourceYml string, appendPath string) 
 		}
 		return toReturn, nil
 	} else {
-		errors.New("Path not found in input yml")
+		return "", errors.New("Path not found in input yml")
 	}
-	return "", nil
+
 }
 func findSpacesCount(splitPath []string, splitInput []string) (int, int, int) {
 	currentSpacesCount := 0
 	foundIndex := -1
 	firstSpaceCount := -1
 	for index, pathElement := range splitPath {
-		for _, inputElement := range splitInput {
+		for indexInInput, inputElement := range splitInput {
 			spaces := strings.Count(inputElement, " ")
 			if spaces > 0 {
 				if firstSpaceCount == -1 {
@@ -56,7 +59,7 @@ func findSpacesCount(splitPath []string, splitInput []string) (int, int, int) {
 					currentSpacesCount = spaceCount
 				}
 				if index == (len(splitPath) - 1) {
-					foundIndex = index
+					foundIndex = indexInInput
 				}
 			}
 		}

@@ -13,7 +13,7 @@ func TestStandardGeneration(t *testing.T) {
 	image := "redis"
 
 	//when
-	output,_ := GenerateYml(ports,volumes,image)
+	output,_ := GenerateYml(ports,volumes,image,"")
 
 	//then
 	assert.Contains(output, "6666:6666", "Missing ports mapping in output")
@@ -93,10 +93,47 @@ func TestYmlMarshal(t *testing.T) {
 	ports := []string{"8080"}
 	image := "jenkins"
 	//when
-	yml,error := GenerateYml(ports, volumes, image)
+	yml,error := GenerateYml(ports, volumes, image,"")
 	//then
 	assert.Nil(error)
 	assert.Contains(yml, "8080:8080")
 	assert.Contains(yml, "jenkins:")
 	assert.Contains(yml, "data:/data")
+}
+
+
+func TestGenerateNamedVolumes(t *testing.T) {
+	assert := assert.New(t)
+	//given
+	volumes := []string{"test_dir:/data/some/dir", "test_dir_some:/data/some/dir_some"}
+	//when
+	volumesString := generateNamedVolumesYml(volumes)
+	//then
+	assert.Equal("test_dir: {}\ntest_dir_some: {}\n", volumesString)
+}
+
+func TestInsertVolumeSectionWhenNotExists(t *testing.T) {
+	assert := assert.New(t)
+
+	//given
+	source := "version:'3'\ntopLevel:"
+	volumes := []string{"test_dir:/data/some/dir", "test_dir_some:/data/some/dir_some"}
+	//when
+	output := insertVolumesSection(source, volumes)
+	//then
+
+	assert.Equal("version:'3'\ntopLevel:\nvolumes:\n   test_dir: {}\n   test_dir_some: {}\n", output)
+}
+
+func TestInsertVolumeSectionWhenExists(t *testing.T) {
+	assert := assert.New(t)
+
+	//given
+	source := "version:'3'\nvolumes:\ntopLevel:"
+	volumes := []string{"test_dir:/data/some/dir", "test_dir_some:/data/some/dir_some"}
+	//when
+	output := insertVolumesSection(source, volumes)
+	//then
+
+	assert.Equal("version:'3'\nvolumes:\n   test_dir: {}\n   test_dir_some: {}\ntopLevel:\n", output)
 }

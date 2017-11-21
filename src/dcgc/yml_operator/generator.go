@@ -58,15 +58,39 @@ func convertImageToServiceName(imageName string) string {
 		return imageName
 	}
 }
-func GenerateYml(ports []string, volumes []string, image string) (string, error) {
+
+func generateNamedVolumesYml(volumes []string) string {
+	output := ""
+	for _,volume := range volumes {
+		output += strings.Split(volume, ":")[0]+": {}" + "\n"
+	}
+	return output
+}
+func insertVolumesSection(sourceYml string, volumes []string) string {
+	volumesString := generateNamedVolumesYml(volumes)
+	if !strings.Contains(sourceYml, "volumes:") {
+		sourceYml += "\nvolumes:"
+	}
+	output,_ := AppendToYmlInSection(volumesString, sourceYml, "volumes")
+	return output
+}
+func GenerateYml(ports []string, volumes []string, image string, sourceYml string) (string, error) {
+	if sourceYml == "" {
+		sourceYml = "version: '3'\nservices:"
+	}
 	serviceName := convertImageToServiceName(image)
+	sourceYml = insertVolumesSection(sourceYml, convertVolumesToNamedVolumes(volumes, serviceName))
 	service := DockerService{image, convertPortsToPublishForm(ports), convertVolumesToNamedVolumes(volumes, serviceName)}
 
-	o, err := yaml.Marshal(map[string]interface{} {
+	serviceYml, err := yaml.Marshal(map[string]interface{} {
 		serviceName: service,
 	})
 	if err != nil {
 		return "", err
 	}
-	return string(o), nil
+	outputYml, err := AppendToYmlInSection(string(serviceYml),sourceYml, "services")
+	if err != nil {
+		return "", err
+	}
+	return outputYml, nil
 }
