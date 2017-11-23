@@ -1,69 +1,42 @@
 package yml_operator
 
 import (
+	"gopkg.in/yaml.v2"
 	"strings"
-	"errors"
 )
 
-func insertSpaces(slices []string, spacesCount int) []string {
-	toInsert := strings.Repeat(" ", spacesCount)
-	slicesToReturn := make([]string, 0)
-	for _, el := range slices {
-		if len(el) == 0 {
-			continue
-		}
-		slicesToReturn = append(slicesToReturn, toInsert+el)
+func get(m map[interface{}]interface{}, path string) map[interface{}]interface{} {
+	pathSplitted := strings.Split(path, ".")
+	iterate := m
+	for _,el := range pathSplitted {
+		iterate = iterate[el].(map[interface{}]interface{})
 	}
-	return slicesToReturn
+	return iterate
+}
+
+func set(m map[interface{}]interface{}, path string, set map[interface{}]interface{}) map[interface{}]interface{} {
+	pathSplitted := strings.Split(path, ".")
+	iterate := m
+	for index,el := range pathSplitted {
+		if index == len(pathSplitted) -1 {
+			iterate[el] = set
+		} else {
+			iterate = iterate[el].(map[interface{}]interface{})
+		}
+	}
+	return iterate
 }
 
 func AppendToYmlInSection(toAppend string, sourceYml string, appendPath string) (string, error) {
-	splitPath := strings.Split(appendPath, ".")
-	splitInput := strings.Split(sourceYml, "\n")
-	splitAppend := strings.Split(toAppend, "\n")
-
-	foundIndex, spacesCount, firstSpacesCount := findSpacesCount(splitPath, splitInput)
-	if foundIndex >= 0 {
-		if firstSpacesCount == -1 {
-			firstSpacesCount = 3
-		}
-		toMerge := insertSpaces(splitAppend, spacesCount+firstSpacesCount)
-		merged := append(splitInput[:foundIndex+1], append(toMerge, splitInput[foundIndex+1:]...)...)
-		toReturn := ""
-		for _, el := range merged {
-			toReturn += el + "\n"
-		}
-		return toReturn, nil
-	} else {
-		return "", errors.New("Path not found in input yml")
+	sourceYmlParsed := make(map[interface{}]interface{})
+	yaml.Unmarshal([]byte(sourceYml), &sourceYmlParsed)
+	toAppendYmlParsed := make(map[interface{}]interface{})
+	yaml.Unmarshal([]byte(toAppend), &toAppendYmlParsed)
+	merged := get(sourceYmlParsed, appendPath)
+	for k, v := range toAppendYmlParsed {
+		merged[k] = v
 	}
-
-}
-func findSpacesCount(splitPath []string, splitInput []string) (int, int, int) {
-	currentSpacesCount := 0
-	foundIndex := -1
-	firstSpaceCount := -1
-	for index, pathElement := range splitPath {
-		for indexInInput, inputElement := range splitInput {
-			spaces := strings.Count(inputElement, " ")
-			if spaces > 0 {
-				if firstSpaceCount == -1 {
-					firstSpaceCount = spaces
-				}
-			}
-			if strings.Contains(inputElement, pathElement) {
-				spaceCount := strings.Count(inputElement, " ")
-				if spaceCount < currentSpacesCount {
-					break
-				} else {
-					currentSpacesCount = spaceCount
-				}
-				if index == (len(splitPath) - 1) {
-					foundIndex = indexInInput
-				}
-			}
-		}
-	}
-
-	return foundIndex, currentSpacesCount, firstSpaceCount
+	set(sourceYmlParsed, appendPath, merged)
+	toReturn,_ := yaml.Marshal(sourceYmlParsed)
+	return string(toReturn), nil
 }
