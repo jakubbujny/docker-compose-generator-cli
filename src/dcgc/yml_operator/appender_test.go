@@ -67,6 +67,22 @@ func TestAppendWhenPathTopLevel(t *testing.T) {
 	assert.Equal("topLevel:\n  services:\n    somewhere: test\n  toAppend:\n    someYml: file\n", output)
 }
 
+
+func TestAppendAtRoot(t *testing.T) {
+	assert := assert.New(t)
+
+	//given
+	path := ""
+	source := "topLevel:\n  somewhere: test"
+	toAppend :="toAppend:\n  someYml: file"
+	//when
+	output,err := AppendToYmlInSection(toAppend, source, path)
+	//then
+
+	assert.Nil(err)
+	assert.Equal("toAppend:\n  someYml: file\ntopLevel:\n  somewhere: test\n", output)
+}
+
 func TestAppendWhenIsVersion(t *testing.T) {
 	assert := assert.New(t)
 
@@ -94,5 +110,5 @@ func TestAppendWhenDoubleSameName(t *testing.T) {
 	//then
 
 	assert.Nil(err)
-	assert.Equal("something:\n  deeper:\n    replace:\n      here: test\nreplace:\n  something: test\n  toAppend: test\n", output)
+	assert.Equal("replace:\n  something: test\n  toAppend: test\nsomething:\n  deeper:\n    replace:\n      here: test\n", output)
 }

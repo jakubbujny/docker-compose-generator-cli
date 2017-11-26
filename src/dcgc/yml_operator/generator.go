@@ -69,7 +69,7 @@ func generateNamedVolumesYml(volumes []string) string {
 func insertVolumesSection(sourceYml string, volumes []string) string {
 	volumesString := generateNamedVolumesYml(volumes)
 	if !strings.Contains(sourceYml, "volumes:") {
-		sourceYml += "\nvolumes: placeholder"
+		AppendToYmlInSection("volumes:", sourceYml, "")
 	}
 	output,_ := AppendToYmlInSection(volumesString, sourceYml, "volumes")
 	return output

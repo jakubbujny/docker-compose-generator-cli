@@ -6,15 +6,24 @@ import (
 )
 
 func get(m map[interface{}]interface{}, path string) map[interface{}]interface{} {
+	if path == "" {
+		return m
+	}
 	pathSplitted := strings.Split(path, ".")
 	iterate := m
 	for _,el := range pathSplitted {
+		if iterate[el] == nil {
+			return make(map[interface{}]interface{})
+		}
 		iterate = iterate[el].(map[interface{}]interface{})
 	}
 	return iterate
 }
 
 func set(m map[interface{}]interface{}, path string, set map[interface{}]interface{}) map[interface{}]interface{} {
+	if path == "" {
+		return set
+	}
 	pathSplitted := strings.Split(path, ".")
 	iterate := m
 	for index,el := range pathSplitted {

@@ -116,24 +116,24 @@ func TestInsertVolumeSectionWhenNotExists(t *testing.T) {
 	assert := assert.New(t)
 
 	//given
-	source := "version:'3'\ntopLevel:"
+	source := "version: '3'"
 	volumes := []string{"test_dir:/data/some/dir", "test_dir_some:/data/some/dir_some"}
 	//when
 	output := insertVolumesSection(source, volumes)
 	//then
 
-	assert.Equal("version:'3'\ntopLevel:\nvolumes:\n   test_dir: {}\n   test_dir_some: {}\n", output)
+	assert.Equal("version: \"3\"\nvolumes:\n  test_dir: {}\n  test_dir_some: {}\n", output)
 }
 
 func TestInsertVolumeSectionWhenExists(t *testing.T) {
 	assert := assert.New(t)
 
 	//given
-	source := "version:'3'\nvolumes:\ntopLevel:"
+	source := "version: '3'\nvolumes:\n  some: {}\n"
 	volumes := []string{"test_dir:/data/some/dir", "test_dir_some:/data/some/dir_some"}
 	//when
 	output := insertVolumesSection(source, volumes)
 	//then
 
-	assert.Equal("version:'3'\nvolumes:\n   test_dir: {}\n   test_dir_some: {}\ntopLevel:\n", output)
+	assert.Equal("version: \"3\"\nvolumes:\n  some: {}\n  test_dir: {}\n  test_dir_some: {}\n", output)
 }
